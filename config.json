@@ -1,0 +1,78 @@
+{
+    "tickers": [
+        "SPY",
+        "QQQ",
+        "AAPL",
+        "MSFT",
+        "GOOGL",
+        "NVDA",
+        "AMD",
+        "RKLB",
+        "NBIS",
+        "TSLA",
+        "LITE",
+        "COHR",
+        "NVO",
+        "LLY",
+        "GRAB",
+        "VRT",
+        "VST",
+        "CEG",
+        "GEV",
+        "BRK-B",
+        "ALAB",
+        "CRDO",
+        "MU"
+    ],
+    "webhook_url": "https://discord.com/api/webhooks/1464036274728993046/HRyL9xxLAVyLKheEgBpDivo5M-Dt2QtRNb-186jpTNyijTcRBJzp1T2oBg1EOdILEMEn",
+    "groups": [
+        {
+            "name": "OVERSOLD (Below 200 EMA)",
+            "logic": "AND",
+            "conditions": [
+                {
+                    "indicator": "Price vs EMA",
+                    "period": 200,
+                    "operator": "<",
+                    "value": 40.0
+                },
+                {
+                    "indicator": "RSI",
+                    "period": 14,
+                    "operator": "<",
+                    "value": 35.0
+                },
+                {
+                    "indicator": "RCI",
+                    "period": 100,
+                    "operator": "<",
+                    "value": -60.0
+                }
+            ]
+        },
+        {
+            "name": "OVERBOUGHT (Above 7 EMA)",
+            "logic": "AND",
+            "conditions": [
+                {
+                    "indicator": "Price vs EMA",
+                    "period": 7,
+                    "operator": ">",
+                    "value": 30
+                },
+                {
+                    "indicator": "RSI",
+                    "period": 14,
+                    "operator": ">",
+                    "value": 70.0
+                },
+                {
+                    "indicator": "RCI",
+                    "period": 14,
+                    "operator": ">",
+                    "value": 80.0
+                }
+            ]
+        }
+    ]
+}
