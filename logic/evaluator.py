@@ -54,6 +54,19 @@ def evaluate_group(close_series: pd.Series, group_config: dict) -> tuple[bool, s
                 met = (current_price < curr_ema) if operator == "<" else (current_price > curr_ema)
                 msg = f"Price {operator} EMA({period})"
             
+            elif ind_type == "EMA Proximity":
+                ema_series = EMAIndicator(period=period).calculate(close_series)
+                curr_ema = round(ema_series.iloc[-1], 2)
+                stats[f'EMA({period})'] = curr_ema
+                
+                # Calculate percentage difference from EMA
+                pct_diff = abs((current_price - curr_ema) / curr_ema * 100)
+                threshold_pct = float(val)
+                
+                # Check if price is within the specified percentage of the EMA
+                met = pct_diff <= threshold_pct
+                msg = f"Price within {threshold_pct:.1f}% of EMA({period})"
+            
             results.append(met)
             if met:
                 messages.append(msg)

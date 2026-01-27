@@ -15,6 +15,7 @@
         "NVO",
         "LLY",
         "GRAB",
+        "SE",
         "VRT",
         "VST",
         "CEG",
@@ -22,7 +23,20 @@
         "BRK-B",
         "ALAB",
         "CRDO",
-        "MU"
+        "AVGO",
+        "RBRK",
+        "NFLX",
+        "AMZN",
+        "TSM",
+        "META",
+        "CRWD",
+        "NET",
+        "UNH",
+        "TTD",
+        "FTNT",
+        "MU",
+        "SNDK",
+        "CRM"
     ],
     "webhook_url": "https://discord.com/api/webhooks/1464036274728993046/HRyL9xxLAVyLKheEgBpDivo5M-Dt2QtRNb-186jpTNyijTcRBJzp1T2oBg1EOdILEMEn",
     "groups": [
@@ -44,7 +58,7 @@
                 },
                 {
                     "indicator": "RCI",
-                    "period": 100,
+                    "period": 14,
                     "operator": "<",
                     "value": -60.0
                 }
@@ -71,6 +85,18 @@
                     "period": 14,
                     "operator": ">",
                     "value": 80.0
+                }
+            ]
+        },
+        {
+            "name": "Around 200 EMA",
+            "logic": "AND",
+            "conditions": [
+                {
+                    "indicator": "EMA Proximity",
+                    "period": 200,
+                    "operator": "<",
+                    "value": 3.0
                 }
             ]
         }

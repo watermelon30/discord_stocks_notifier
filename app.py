@@ -67,7 +67,9 @@ with st.sidebar:
     current_tickers = ", ".join(config.get("tickers", []))
     new_tickers = st.text_area("Tickers (comma separated)", value=current_tickers, height=100)
     if new_tickers != current_tickers:
-        config["tickers"] = [t.strip().upper() for t in new_tickers.split(",") if t.strip()]
+        raw_list = [t.strip().upper() for t in new_tickers.split(",") if t.strip()]
+        unique_tickers = list(dict.fromkeys(raw_list))
+        config["tickers"] = unique_tickers
         save_current_config()
         
     # Webhook
@@ -122,7 +124,7 @@ with st.sidebar:
                 
                 # Indicator Type
                 with c1:
-                    ind_types = ["RSI", "RCI", "Price vs EMA"]
+                    ind_types = ["RSI", "RCI", "Price vs EMA", "EMA Proximity"]
                     curr_type = cond.get("indicator", "RSI")
                     new_type = st.selectbox("Indicator", ind_types, index=ind_types.index(curr_type) if curr_type in ind_types else 0, key=f"c_type_{i}_{j}", label_visibility="collapsed")
                     if new_type != curr_type:
@@ -132,30 +134,60 @@ with st.sidebar:
 
                 # Period
                 with c2:
+                    ema_periods = [7, 13, 21, 55, 100, 200] 
+                    osc_periods = [9, 14, 21, 30, 50]
                     current_period = cond.get("period", 14)
-                    if new_type == "Price vs EMA":
-                        ema_periods = [7, 13, 21, 55, 100, 200]
-                        new_period = st.selectbox("Period", ema_periods, index=ema_periods.index(current_period) if current_period in ema_periods else 5, key=f"c_per_{i}_{j}", label_visibility="collapsed")
+                    if new_type in ["Price vs EMA", "EMA Proximity"]:
+                        new_period = st.selectbox(
+                            "Period", 
+                            ema_periods, 
+                            index=ema_periods.index(current_period) if current_period in ema_periods else 5, 
+                            key=f"c_per_{i}_{j}", 
+                            label_visibility="collapsed"
+                        )
+                    elif new_type in ["RSI", "RCI"]:
+                        new_period = st.selectbox(
+                            "Period", 
+                            osc_periods, 
+                            index=osc_periods.index(current_period) if current_period in osc_periods else 1, # Default to 14
+                            key=f"c_per_{i}_{j}", 
+                            label_visibility="collapsed"
+                        )
                     else:
-                        new_period = st.number_input("Period", value=int(current_period), min_value=1, key=f"c_per_{i}_{j}", label_visibility="collapsed")
-                    
+                        # Fallback for any other indicators
+                        new_period = st.number_input(
+                            "Period", 
+                            value=int(current_period), 
+                            min_value=1, 
+                            key=f"c_per_{i}_{j}", 
+                            label_visibility="collapsed"
+                        )
                     if new_period != current_period:
                         cond["period"] = new_period
                         save_current_config()
 
                 # Operator
                 with c3:
-                    ops = ["<", ">"]
-                    curr_op = cond.get("operator", "<")
-                    new_op = st.selectbox("Op", ops, index=ops.index(curr_op), key=f"c_op_{i}_{j}", label_visibility="collapsed")
-                    if new_op != curr_op:
-                        cond["operator"] = new_op
-                        save_current_config()
+                    if new_type == "EMA Proximity":
+                        st.write("within %:") # Placeholder, threshold is dynamic
+                    else:
+                        ops = ["<", ">"]
+                        curr_op = cond.get("operator", "<")
+                        new_op = st.selectbox("Op", ops, index=ops.index(curr_op), key=f"c_op_{i}_{j}", label_visibility="collapsed")
+                        if new_op != curr_op:
+                            cond["operator"] = new_op
+                            save_current_config()
 
-                # Value (Threshold) - Only for RSI/RCI
+                # Value (Threshold) - Only for RSI/RCI, or percentage for EMA Proximity
                 with c4:
                     if new_type == "Price vs EMA":
                         st.write("Current EMA") # Placeholder, threshold is dynamic
+                    elif new_type == "EMA Proximity":
+                        curr_val = cond.get("value", 3.0)
+                        new_val = st.number_input("Within %", value=float(curr_val), min_value=0.1, max_value=100.0, step=0.5, key=f"c_val_{i}_{j}", label_visibility="collapsed")
+                        if new_val != curr_val:
+                            cond["value"] = new_val
+                            save_current_config()
                     else:
                         curr_val = cond.get("value", 30)
                         new_val = st.number_input("Val", value=float(curr_val), key=f"c_val_{i}_{j}", label_visibility="collapsed")
