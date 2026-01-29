@@ -2,6 +2,17 @@
     "tickers": [
         "SPY",
         "QQQ",
+        "XLK",
+        "XLE",
+        "XLF",
+        "XLB",
+        "XLC",
+        "XLU",
+        "XLI",
+        "XLV",
+        "XLY",
+        "XLRE",
+        "XLP",
         "AAPL",
         "MSFT",
         "GOOGL",
@@ -36,7 +47,13 @@
         "FTNT",
         "MU",
         "SNDK",
-        "CRM"
+        "CRM",
+        "V",
+        "MA",
+        "PEP",
+        "INTU",
+        "SAP",
+        "UVIX"
     ],
     "webhook_url": "https://discord.com/api/webhooks/1464036274728993046/HRyL9xxLAVyLKheEgBpDivo5M-Dt2QtRNb-186jpTNyijTcRBJzp1T2oBg1EOdILEMEn",
     "groups": [
