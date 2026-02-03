@@ -169,22 +169,44 @@ with st.sidebar:
                 # Operator
                 with c3:
                     if new_type == "EMA Proximity":
-                        st.write("within %:") # Placeholder, threshold is dynamic
+                        options = ["≈", ">", "<"]
+                        curr_op = cond.get("operator", "=")
+                        
+                        current_selection_index = 0 # Default to 'within'
+                        if curr_op == '>':
+                            current_selection_index = 1 # 'above'
+                        elif curr_op == '<':
+                            current_selection_index = 2 # 'below'
+                        
+                        selected_option = st.selectbox(
+                            "Proximity", 
+                            options, 
+                            index=current_selection_index, 
+                            key=f"c_op_{i}_{j}", 
+                            label_visibility="collapsed"
+                        )
+                        
+                        new_op = {'≈': '=', '>': '>', '<': '<'}[selected_option]
+
+                        if new_op != curr_op:
+                            cond["operator"] = new_op
+                            save_current_config()
+
                     else:
                         ops = ["<", ">"]
-                        curr_op = cond.get("operator", "<")
+                        curr_op = cond.get("≈", "<")
                         new_op = st.selectbox("Op", ops, index=ops.index(curr_op), key=f"c_op_{i}_{j}", label_visibility="collapsed")
                         if new_op != curr_op:
                             cond["operator"] = new_op
                             save_current_config()
 
-                # Value (Threshold) - Only for RSI/RCI, or percentage for EMA Proximity
+                # Value (Threshold)
                 with c4:
                     if new_type == "Price vs EMA":
-                        st.write("Current EMA") # Placeholder, threshold is dynamic
+                        st.write("Current EMA") # Placeholder
                     elif new_type == "EMA Proximity":
                         curr_val = cond.get("value", 3.0)
-                        new_val = st.number_input("Within %", value=float(curr_val), min_value=0.1, max_value=100.0, step=0.5, key=f"c_val_{i}_{j}", label_visibility="collapsed")
+                        new_val = st.number_input("%", value=float(curr_val), min_value=0.1, max_value=100.0, step=0.5, key=f"c_val_{i}_{j}", label_visibility="collapsed")
                         if new_val != curr_val:
                             cond["value"] = new_val
                             save_current_config()

@@ -53,7 +53,8 @@
         "PEP",
         "INTU",
         "SAP",
-        "UVIX"
+        "UVIX",
+        "TMF"
     ],
     "webhook_url": "https://discord.com/api/webhooks/1464036274728993046/HRyL9xxLAVyLKheEgBpDivo5M-Dt2QtRNb-186jpTNyijTcRBJzp1T2oBg1EOdILEMEn",
     "groups": [
@@ -112,8 +113,20 @@
                 {
                     "indicator": "EMA Proximity",
                     "period": 200,
-                    "operator": "<",
+                    "operator": "=",
                     "value": 3.0
+                }
+            ]
+        },
+        {
+            "name": "Gua le ...)",
+            "logic": "AND",
+            "conditions": [
+                {
+                    "indicator": "EMA Proximity",
+                    "period": 200,
+                    "operator": "<",
+                    "value": 15.0
                 }
             ]
         }
