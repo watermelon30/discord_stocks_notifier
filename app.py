@@ -314,12 +314,57 @@ if st.button("🚀 Run Analysis", type="primary"):
                 # --- Notifications ---
                 if config.get("webhook_url"):
                     if all_alerts_text:
-                        full_msg = "**Stock Alerts Triggered**\n\n" + "\n\n".join(all_alerts_text)
-                        success, resp = send_discord_message(config["webhook_url"], full_msg)
-                        if success:
-                            st.toast("Discord notification sent!", icon="✅")
-                        else:
-                            st.error(f"Discord Error: {resp}")
+                        DISCORD_LIMIT = 2000
+                        header = "**Stock Alerts Triggered**"
+                        
+                        messages_to_send = []
+                        current_message_parts = []
+                        # Reserve space for header, page numbers like (1/2), and newlines
+                        current_length = len(header) + 20 
+                        
+                        for group_alert in all_alerts_text:
+                            alert_len = len(group_alert) + 2  # for \n\n separator
+
+                            # If adding the next group exceeds the limit, send the current message
+                            # and start a new one. A very large group will be sent in its own message.
+                            if current_message_parts and current_length + alert_len > DISCORD_LIMIT:
+                                messages_to_send.append("\n\n".join(current_message_parts))
+                                current_message_parts = []
+                                current_length = len(header) + 20
+                            
+                            current_message_parts.append(group_alert)
+                            current_length += alert_len
+
+                        if current_message_parts:
+                            messages_to_send.append("\n\n".join(current_message_parts))
+                        
+                        num_messages = len(messages_to_send)
+                        success_count = 0
+                        
+                        for i, message_body in enumerate(messages_to_send):
+                            final_header = header
+                            if num_messages > 1:
+                                final_header += f" ({i+1}/{num_messages})"
+                            
+                            full_msg = f"{final_header}\n\n{message_body}"
+                            
+                            # Check length one last time before sending
+                            if len(full_msg) > DISCORD_LIMIT:
+                                st.error(f"Message {i+1}/{num_messages} is too long ({len(full_msg)} chars) and could not be sent. This can happen if a single group's alert is too large.")
+                                continue # Skip sending this one
+
+                            success, resp = send_discord_message(config["webhook_url"], full_msg)
+                            
+                            if success:
+                                success_count += 1
+                            else:
+                                st.error(f"Discord Error on message {i+1}/{num_messages}: {resp}")
+                        
+                        if success_count > 0:
+                            st.toast(f"{success_count} of {num_messages} Discord notification(s) sent!", icon="✅")
+                        if success_count < num_messages:
+                            st.warning(f"Failed to send {num_messages - success_count} notification(s).")
+
                 else:
                     st.warning("Notifications skipped (No Webhook URL configured).")
 
