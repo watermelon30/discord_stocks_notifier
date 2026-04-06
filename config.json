@@ -18,6 +18,8 @@
         "GOOGL",
         "NVDA",
         "AMD",
+        "ARM",
+        "INTL",
         "RKLB",
         "NBIS",
         "TSLA",
@@ -54,7 +56,16 @@
         "INTU",
         "SAP",
         "UVIX",
-        "TMF"
+        "TMF",
+        "TLT",
+        "SVIX",
+        "AXTI",
+        "GLD",
+        "SLV",
+        "MRVL",
+        "NOK",
+        "BE",
+        "GE"
     ],
     "webhook_url": "https://discord.com/api/webhooks/1464036274728993046/HRyL9xxLAVyLKheEgBpDivo5M-Dt2QtRNb-186jpTNyijTcRBJzp1T2oBg1EOdILEMEn",
     "groups": [
