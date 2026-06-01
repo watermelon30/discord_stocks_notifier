@@ -21,17 +21,40 @@ def extract_ticker_df(raw_data: pd.DataFrame, ticker: str, num_tickers: int) -> 
     return None
 
 
+def get_all_tickers(config: dict) -> list[str]:
+    """Extract a flat list of all tickers from ticker_categories."""
+    categories = config.get("ticker_categories", {})
+    all_tickers = []
+    for tickers in categories.values():
+        for t in tickers:
+            if t not in all_tickers:
+                all_tickers.append(t)
+    return all_tickers
+
+
+def get_ticker_category_map(config: dict) -> dict[str, str]:
+    """Build a mapping of ticker -> category name."""
+    categories = config.get("ticker_categories", {})
+    ticker_to_category = {}
+    for category, tickers in categories.items():
+        for t in tickers:
+            ticker_to_category[t] = category
+    return ticker_to_category
+
+
 def run_analysis(config: dict) -> dict[str, list[dict]]:
     """
     Fetch stock data and evaluate all rule groups against all tickers.
     Returns a dict mapping group description to a list of triggered ticker stats.
+    Each stat dict includes a '_category' key for display grouping.
     """
-    tickers = config.get("tickers", [])
+    tickers = get_all_tickers(config)
     groups = config.get("groups", [])
 
     if not tickers or not groups:
         return {}
 
+    ticker_to_category = get_ticker_category_map(config)
     raw_data = fetch_stock_data(tickers)
     results_by_group: dict[str, list[dict]] = {}
 
@@ -49,6 +72,7 @@ def run_analysis(config: dict) -> dict[str, list[dict]]:
                 if group_title not in results_by_group:
                     results_by_group[group_title] = []
                 stats["Ticker"] = ticker
+                stats["_category"] = ticker_to_category.get(ticker, "Other")
                 results_by_group[group_title].append(stats)
 
     return results_by_group

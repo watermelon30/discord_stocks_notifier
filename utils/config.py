@@ -7,7 +7,9 @@ load_dotenv()
 CONFIG_FILE = "config.json"
 
 DEFAULT_CONFIG = {
-    "tickers": ["AAPL", "MSFT", "GOOGL", "TSLA", "SPY"],
+    "ticker_categories": {
+        "Default": ["AAPL", "MSFT", "GOOGL", "TSLA", "SPY"]
+    },
     "webhook_url": "",
     "groups": [
         {

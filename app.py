@@ -23,14 +23,64 @@ def save_current_config():
 # --- Sidebar Helper Functions ---
 
 def render_tickers_input():
-    """Render the tickers text area and persist changes."""
-    current_tickers = ", ".join(config.get("tickers", []))
-    new_tickers = st.text_area("Tickers (comma separated)", value=current_tickers, height=100)
-    if new_tickers != current_tickers:
-        raw_list = [t.strip().upper() for t in new_tickers.split(",") if t.strip()]
-        unique_tickers = list(dict.fromkeys(raw_list))
-        config["tickers"] = unique_tickers
+    """Render the ticker categories editor in the sidebar."""
+    st.subheader("Ticker Categories")
+    categories = config.get("ticker_categories", {})
+
+    # Add new category
+    with st.form("add_category_form", clear_on_submit=True):
+        new_cat_name = st.text_input("New category name", label_visibility="collapsed", placeholder="New category name...")
+        submitted = st.form_submit_button("➕ Add Category")
+        if submitted and new_cat_name.strip() and new_cat_name.strip() not in categories:
+            categories[new_cat_name.strip()] = []
+            config["ticker_categories"] = categories
+            save_current_config()
+            st.rerun()
+
+    # Render each category
+    cats_to_remove = []
+    for cat_name in list(categories.keys()):
+        with st.expander(f"🏷️ {cat_name} ({len(categories[cat_name])})", expanded=True):
+            # Editable category name
+            new_cat_name = st.text_input(
+                "Category Name", value=cat_name,
+                key=f"cat_name_{cat_name}", label_visibility="collapsed"
+            )
+            if new_cat_name != cat_name and new_cat_name.strip():
+                # Rename: preserve order by rebuilding the dict
+                new_categories = {}
+                for k, v in categories.items():
+                    if k == cat_name:
+                        new_categories[new_cat_name.strip()] = v
+                    else:
+                        new_categories[k] = v
+                config["ticker_categories"] = new_categories
+                save_current_config()
+                st.rerun()
+
+            current_tickers = ", ".join(categories[cat_name])
+            new_tickers = st.text_area(
+                "Tickers (comma separated)",
+                value=current_tickers,
+                height=68,
+                key=f"cat_tickers_{cat_name}"
+            )
+            if new_tickers != current_tickers:
+                raw_list = [t.strip().upper() for t in new_tickers.split(",") if t.strip()]
+                unique_tickers = list(dict.fromkeys(raw_list))
+                categories[cat_name] = unique_tickers
+                config["ticker_categories"] = categories
+                save_current_config()
+
+            if st.button("🗑️ Delete Category", key=f"del_cat_{cat_name}"):
+                cats_to_remove.append(cat_name)
+
+    if cats_to_remove:
+        for cat in cats_to_remove:
+            del categories[cat]
+        config["ticker_categories"] = categories
         save_current_config()
+        st.rerun()
 
 
 def render_webhook_input():
@@ -290,7 +340,9 @@ def display_results(results_by_group: dict[str, list[dict]]):
 
     for g_name, matches in results_by_group.items():
         st.subheader(f"🔔 {g_name}")
-        res_df = pd.DataFrame(matches)
+        # Remove internal keys for Streamlit table display
+        display_matches = [{k: v for k, v in m.items() if not k.startswith("_")} for m in matches]
+        res_df = pd.DataFrame(display_matches)
         st.table(res_df)
 
         table_text = format_discord_table(matches)
@@ -315,10 +367,11 @@ def display_results(results_by_group: dict[str, list[dict]]):
 
 
 if st.button("🚀 Run Analysis", type="primary"):
-    tickers = config.get("tickers", [])
+    ticker_categories = config.get("ticker_categories", {})
+    all_tickers = [t for tickers in ticker_categories.values() for t in tickers]
     groups = config.get("groups", [])
 
-    if not tickers:
+    if not all_tickers:
         st.warning("Please add some tickers in the settings.")
     elif not groups:
         st.warning("Please configure at least one rule group.")
