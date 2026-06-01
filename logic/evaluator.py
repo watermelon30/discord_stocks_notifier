@@ -72,6 +72,30 @@ def evaluate_group(close_series: pd.Series, group_config: dict) -> tuple[bool, s
                     met = abs(pct_diff) <= threshold_pct
                     msg = f"Price within {threshold_pct:.1f}% of EMA({period})"
             
+            elif ind_type == "Days Above EMA":
+                ema_series = EMAIndicator(period=period).calculate(close_series)
+                curr_ema = round(ema_series.iloc[-1], 2)
+                stats[f'EMA({period})'] = curr_ema
+                
+                # Count consecutive days price has been above EMA (from most recent day backwards)
+                above = close_series > ema_series
+                consecutive_days = 0
+                for k in range(len(above) - 1, -1, -1):
+                    if above.iloc[k]:
+                        consecutive_days += 1
+                    else:
+                        break
+                
+                stats[f'Days>EMA({period})'] = consecutive_days
+                threshold_days = int(val)
+                
+                if operator == '>=':
+                    met = consecutive_days >= threshold_days
+                    msg = f"Above EMA({period}) for {consecutive_days}d (>={threshold_days}d)"
+                else:  # '<='
+                    met = consecutive_days <= threshold_days
+                    msg = f"Above EMA({period}) for {consecutive_days}d (<={threshold_days}d)"
+            
             results.append(met)
             if met:
                 messages.append(msg)

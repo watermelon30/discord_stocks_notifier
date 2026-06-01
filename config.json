@@ -18,6 +18,8 @@
         "GOOGL",
         "NVDA",
         "AMD",
+        "ARM",
+        "INTL",
         "RKLB",
         "NBIS",
         "TSLA",
@@ -54,9 +56,19 @@
         "INTU",
         "SAP",
         "UVIX",
-        "TMF"
+        "TMF",
+        "TLT",
+        "SVIX",
+        "AXTI",
+        "GLD",
+        "SLV",
+        "MRVL",
+        "NOK",
+        "BE",
+        "GE",
+        "PLTR",
+        "NOW"
     ],
-    "webhook_url": "https://discord.com/api/webhooks/1464036274728993046/HRyL9xxLAVyLKheEgBpDivo5M-Dt2QtRNb-186jpTNyijTcRBJzp1T2oBg1EOdILEMEn",
     "groups": [
         {
             "name": "OVERSOLD (Below 200 EMA)",
@@ -127,6 +139,24 @@
                     "period": 200,
                     "operator": "<",
                     "value": 15.0
+                }
+            ]
+        },
+        {
+            "name": "chongchongchong (> EMA(13) for 8d+,  ~EMA(13))",
+            "logic": "AND",
+            "conditions": [
+                {
+                    "indicator": "Days Above EMA",
+                    "period": 13,
+                    "operator": ">=",
+                    "value": 8
+                },
+                {
+                    "indicator": "EMA Proximity",
+                    "period": 13,
+                    "operator": "=",
+                    "value": 1.5
                 }
             ]
         }
