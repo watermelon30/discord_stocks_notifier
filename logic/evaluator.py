@@ -91,10 +91,10 @@ def evaluate_group(close_series: pd.Series, group_config: dict) -> tuple[bool, s
                 
                 if operator == '>=':
                     met = consecutive_days >= threshold_days
-                    msg = f"Above EMA({period}) for {consecutive_days}d (>={threshold_days}d)"
+                    msg = f"Above EMA({period}) >= {threshold_days}d"
                 else:  # '<='
                     met = consecutive_days <= threshold_days
-                    msg = f"Above EMA({period}) for {consecutive_days}d (<={threshold_days}d)"
+                    msg = f"Above EMA({period}) <= {threshold_days}d"
             
             results.append(met)
             if met:
